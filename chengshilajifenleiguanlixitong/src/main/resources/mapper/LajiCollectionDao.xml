@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.LajiCollectionDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.laji_id as lajiId
+        ,a.yonghu_id as yonghuId
+        ,a.laji_collection_types as lajiCollectionTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.LajiCollectionView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,laji.laji_name as lajiName
+        ,laji.laji_uuid_number as lajiUuidNumber
+        ,laji.laji_photo as lajiPhoto
+        ,laji.laji_types as lajiTypes
+        ,laji.laji_clicknum as lajiClicknum
+        ,laji.laji_content as lajiContent
+        ,laji.shangxia_types as shangxiaTypes
+        ,laji.laji_delete as lajiDelete
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+
+        FROM laji_collection  a
+        left JOIN laji laji ON a.laji_id = laji.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.lajiId != null and params.lajiId != ''">
+                and (
+                    a.laji_id = #{params.lajiId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.lajiCollectionTypes != null and params.lajiCollectionTypes != ''">
+                and a.laji_collection_types = #{params.lajiCollectionTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断垃圾的id不为空 -->
+            <if test=" params.lajiIdNotNull != '' and params.lajiIdNotNull != null and params.lajiIdNotNull != 'null' ">
+                and a.laji_id IS NOT NULL
+            </if>
+            <if test=" params.lajiName != '' and params.lajiName != null and params.lajiName != 'null' ">
+                and laji.laji_name like CONCAT('%',#{params.lajiName},'%')
+            </if>
+            <if test=" params.lajiUuidNumber != '' and params.lajiUuidNumber != null and params.lajiUuidNumber != 'null' ">
+                and laji.laji_uuid_number like CONCAT('%',#{params.lajiUuidNumber},'%')
+            </if>
+            <if test="params.lajiTypes != null  and params.lajiTypes != ''">
+                and laji.laji_types = #{params.lajiTypes}
+            </if>
+
+            <if test="params.lajiClicknumStart != null  and params.lajiClicknumStart != '' ">
+                <![CDATA[  and laji.laji_clicknum >= #{params.lajiClicknumStart}   ]]>
+            </if>
+            <if test="params.lajiClicknumEnd != null  and params.lajiClicknumEnd != '' ">
+                <![CDATA[  and laji.laji_clicknum <= #{params.lajiClicknumEnd}   ]]>
+            </if>
+            <if test="params.lajiClicknum != null  and params.lajiClicknum != '' ">
+                and laji.laji_clicknum = #{params.lajiClicknum}
+            </if>
+            <if test=" params.lajiContent != '' and params.lajiContent != null and params.lajiContent != 'null' ">
+                and laji.laji_content like CONCAT('%',#{params.lajiContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null  and params.shangxiaTypes != ''">
+                and laji.shangxia_types = #{params.shangxiaTypes}
+            </if>
+
+            <if test="params.lajiDeleteStart != null  and params.lajiDeleteStart != '' ">
+                <![CDATA[  and laji.laji_delete >= #{params.lajiDeleteStart}   ]]>
+            </if>
+            <if test="params.lajiDeleteEnd != null  and params.lajiDeleteEnd != '' ">
+                <![CDATA[  and laji.laji_delete <= #{params.lajiDeleteEnd}   ]]>
+            </if>
+            <if test="params.lajiDelete != null  and params.lajiDelete != '' ">
+                and laji.laji_delete = #{params.lajiDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(laji.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(laji.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

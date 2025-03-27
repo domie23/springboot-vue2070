@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.LajiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.laji_name as lajiName
+        ,a.laji_uuid_number as lajiUuidNumber
+        ,a.laji_photo as lajiPhoto
+        ,a.laji_types as lajiTypes
+        ,a.laji_clicknum as lajiClicknum
+        ,a.laji_content as lajiContent
+        ,a.shangxia_types as shangxiaTypes
+        ,a.laji_delete as lajiDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.LajiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM laji  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.lajiName != '' and params.lajiName != null and params.lajiName != 'null' ">
+                and a.laji_name like CONCAT('%',#{params.lajiName},'%')
+            </if>
+            <if test=" params.lajiUuidNumber != '' and params.lajiUuidNumber != null and params.lajiUuidNumber != 'null' ">
+                and a.laji_uuid_number like CONCAT('%',#{params.lajiUuidNumber},'%')
+            </if>
+            <if test="params.lajiTypes != null and params.lajiTypes != ''">
+                and a.laji_types = #{params.lajiTypes}
+            </if>
+            <if test="params.lajiClicknumStart != null and params.lajiClicknumStart != ''">
+                <![CDATA[  and a.laji_clicknum >= #{params.lajiClicknumStart}   ]]>
+            </if>
+            <if test="params.lajiClicknumEnd != null and params.lajiClicknumEnd != ''">
+                <![CDATA[  and a.laji_clicknum <= #{params.lajiClicknumEnd}   ]]>
+            </if>
+             <if test="params.lajiClicknum != null and params.lajiClicknum != ''">
+                and a.laji_clicknum = #{params.lajiClicknum}
+             </if>
+            <if test=" params.lajiContent != '' and params.lajiContent != null and params.lajiContent != 'null' ">
+                and a.laji_content like CONCAT('%',#{params.lajiContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null and params.shangxiaTypes != ''">
+                and a.shangxia_types = #{params.shangxiaTypes}
+            </if>
+            <if test="params.lajiDeleteStart != null and params.lajiDeleteStart != ''">
+                <![CDATA[  and a.laji_delete >= #{params.lajiDeleteStart}   ]]>
+            </if>
+            <if test="params.lajiDeleteEnd != null and params.lajiDeleteEnd != ''">
+                <![CDATA[  and a.laji_delete <= #{params.lajiDeleteEnd}   ]]>
+            </if>
+             <if test="params.lajiDelete != null and params.lajiDelete != ''">
+                and a.laji_delete = #{params.lajiDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
